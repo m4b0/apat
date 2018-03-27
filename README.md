@@ -1,5 +1,5 @@
 # apat
-__Another personalized aggregator tool__
+### Another personalized aggregator tool
 
 Information aggregators are tools which pull in information from multiple sources, and consolidate that information into a smaller and more easily digested number of streams.
 
@@ -17,15 +17,15 @@ Typically an aggregator is a system of subprograms:
 * Summarization- this is typically done through queries to the db and can be adjusted based on user preferences
 * View - this formats the information for what the user would like to see and can respond to feedback on the user's likes or dislikes of the item suggested.
 
-__Functionality__
+#### Functionality
 
 
-__Features__
-Present useful information to user.
-Suggest new sources of information.
-Identify and capture user interests.
+#### Features
+* Present useful information to user.
+* Suggest new sources of information.
+* Identify and capture user interests.
 
-__Future
+#### Future
 
 
 
