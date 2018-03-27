@@ -12,14 +12,12 @@ Over the past 15 years, we’ve seen an explosion in the number of different sou
 
 Content aggregator websites don’t produce their own content. Instead, they collect content from other websites around the Internet and “aggregate” it into one easy-to-find location.
 
+#### Functionality
 Typically an aggregator is a system of subprograms:
 * Connector, this organize and connect to sources of information
 * Grabber, this searches and grabs all of the content that is needed to be summarized
 * Summarization- this is typically done through queries to the db and can be adjusted based on user preferences
 * View - this formats the information for what the user would like to see and can respond to feedback on the user's likes or dislikes of the item suggested.
-
-#### Functionality
-
 
 #### Features
 * Present useful information to user.
