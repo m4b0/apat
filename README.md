@@ -25,8 +25,11 @@ Typically an aggregator is a system of subprograms:
 * Identify and capture user interests.
 
 #### Future
-
-
+* More personal
+* More tuning
+* More intelligence
+* More useful
+* More… ツ 
 
 #### References
 
