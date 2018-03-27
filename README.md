@@ -1,6 +1,7 @@
 # apat
 ### Another personalized aggregator tool
 
+#### Introduction
 Information aggregators are tools which pull in information from multiple sources, and consolidate that information into a smaller and more easily digested number of streams.
 
 There are many such information aggregators as a concept, and we use them all the time without thinking – things in the physical world like the Encyclopedia, the newspaper, the library, and so on. In the digital world we also found their equivalents.
@@ -29,7 +30,7 @@ Typically an aggregator is a system of subprograms:
 
 
 
-References:
+#### References
 
 http://michaelnielsen.org/blog/information-aggregators/
 
