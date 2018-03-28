@@ -59,18 +59,23 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, "\n")
 
-	//	fmt.Fprintf(w, "Hi there, I love %s!\n", r.URL.Path[1:])
-	//	fmt.Fprintf(w, "Yeah, %s!\n", r.URL.Path[1:])
+	// Topics
 	fmt.Fprintf(w, "<b>--- %s ---</b>\n", r.URL.Path[1:])
-
 	fp := gofeed.NewParser()
 	feed, _ := fp.ParseURL("http://feeds.twit.tv/twit.xml")
-	//	fmt.Println(feed.Title)
 	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "<a href=%s>%s</a>", feed.Link, feed.Title)
+	fmt.Fprintf(w, "<b><a href=\"%s\">%s</a></b>", feed.Link, feed.Title)
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[0].Link, feed.Items[0].Title, feed.Items[0].Published)
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[1].Link, feed.Items[1].Title, feed.Items[1].Published)
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[2].Link, feed.Items[2].Title, feed.Items[2].Published)
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, "%+v\n", feed)
+
+	// Footer
 	fmt.Fprintf(w, "</pre>")
 	fmt.Fprintf(w, "</body></html>")
 	fmt.Fprintf(w, "\n")
