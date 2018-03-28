@@ -1,4 +1,4 @@
-# apat
+# apat (a path)
 ### Another personalized aggregator tool
 
 #### Introduction
