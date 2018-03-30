@@ -1,1 +1,2 @@
-https://www.cisecurity.org/cybersecurity-threats/ - cibersecurity-threats - Alert Level - .*<span class="text-primary .+">(.+)<\/span>
+https://www.cisecurity.org/cybersecurity-threats/ - cibersecurity-threats - Alert Level - .*<span class="text-primary .+">(.+)</span>
+https://www.ovh.com/ca/en/news/ - OVH-news - Latest news - >Latest news.+\n.+<a .+>(.+)</a>
