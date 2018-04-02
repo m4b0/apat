@@ -30,6 +30,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	inFile, _ := os.Open(path)
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
+	defer inFile.Close()
 
 	for scanner.Scan() {
 		content := strings.Split(scanner.Text(), " - ")
@@ -43,6 +44,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		bodyString := string(bodyBytes)
+		defer resp.Body.Close() // close Body when the function returns
 
 		lookFor := content[3]
 		//fmt.Fprintf(w, "<textarea>%+v</textarea>\n", lookFor)
@@ -54,10 +56,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "<a href=\"%s\">%s</a> %s Not-Found\n", content[0], content[1], content[2])
 		}
 
-		resp.Body.Close() // close Body when the function returns
+		//resp.Body.Close() // close Body when the function returns
 	}
 	fmt.Fprintf(w, "\n")
-	inFile.Close()
+	// inFile.Close()
 
 	// Topics
 	files, err := ioutil.ReadDir("./topics")
@@ -66,25 +68,27 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, f := range files {
-		fmt.Fprintf(w, "<b>--- %s ---</b>\n", f.Name())
+		fmt.Fprintf(w, "<b>--- %s ---</b>\n\n", f.Name())
 
 		path := "sources/" + f.Name() + ".src"
 		inFile, _ := os.Open(path)
 		scanner := bufio.NewScanner(inFile)
 		scanner.Split(bufio.ScanLines)
+		defer inFile.Close()
 
 		for scanner.Scan() {
 			feedUrl := scanner.Text()
 
 			fp := gofeed.NewParser()
-			//feed, _ := fp.ParseURL("http://feeds.twit.tv/twit.xml")
-			feed, _ := fp.ParseURL(feedUrl)
-			fmt.Fprintf(w, "\n")
+			feed, err := fp.ParseURL(feedUrl)
+			if err != nil {
+				fmt.Fprintf(w, "getting %s not found ", feedUrl)
+				continue
+			}
 			if len(feed.Title) > 1 {
 				fmt.Fprintf(w, "<b><a href=\"%s\">%s</a></b>", feed.Link, feed.Title)
 			} else {
 				fmt.Fprintf(w, "<b><a href=\"%s\">%s</a></b>", feed.Link, feed.Link)
-				//fmt.Fprintf(w, "%+v\n", feed)
 			}
 			fmt.Fprintf(w, "\n")
 			fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[0].Link, feed.Items[0].Title, feed.Items[0].Published)
@@ -94,10 +98,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[2].Link, feed.Items[2].Title, feed.Items[2].Published)
 			fmt.Fprintf(w, "\n")
 			fmt.Fprintf(w, "\n")
-			//		fmt.Fprintf(w, "%+v\n", feed)
 		}
 
-		inFile.Close()
+		//inFile.Close()
 	}
 	// Footer
 	fmt.Fprintf(w, "</pre>")
