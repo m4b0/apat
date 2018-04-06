@@ -26,6 +26,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	// Hot Topics
 	fmt.Fprintf(w, "<b>--- Hot topics ---</b>\n")
 	fmt.Fprintf(w, "\n")
+
+	// CISecurity Cyber Threat Alert Level
+	url := "https://feeds.cisecurity.org/text?keys=description"
+	resp, err := http.Get(url)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyString := string(bodyBytes)
+	defer resp.Body.Close() // close Body when the function returns
+	fmt.Fprintf(w, "<textarea rows=\"5\"cols=\"60\">")
+	fmt.Fprintf(w, bodyString)
+	fmt.Fprintf(w, "</textarea>\n\n")
+
 	path := "sources/hot-topics.src"
 	inFile, _ := os.Open(path)
 	scanner := bufio.NewScanner(inFile)
@@ -55,11 +66,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			fmt.Fprintf(w, "<a href=\"%s\">%s</a> %s Not-Found\n", content[0], content[1], content[2])
 		}
-
-		//resp.Body.Close() // close Body when the function returns
 	}
 	fmt.Fprintf(w, "\n")
-	// inFile.Close()
 
 	// Topics
 	files, err := ioutil.ReadDir("./topics")
@@ -90,6 +98,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				fmt.Fprintf(w, "<b><a href=\"%s\">%s</a></b>", feed.Link, feed.Link)
 			}
+			// Check that variables contain values
 			fmt.Fprintf(w, "\n")
 			fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[0].Link, feed.Items[0].Title, feed.Items[0].Published)
 			fmt.Fprintf(w, "\n")
