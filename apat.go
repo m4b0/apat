@@ -98,13 +98,22 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				fmt.Fprintf(w, "<b><a href=\"%s\">%s</a></b>", feed.Link, feed.Link)
 			}
-			// Check that variables contain values
-			fmt.Fprintf(w, "\n")
-			fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[0].Link, feed.Items[0].Title, feed.Items[0].Published)
-			fmt.Fprintf(w, "\n")
-			fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[1].Link, feed.Items[1].Title, feed.Items[1].Published)
-			fmt.Fprintf(w, "\n")
-			fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[2].Link, feed.Items[2].Title, feed.Items[2].Published)
+			// Check that variables contain values, if empty assign N/A
+			for i := 0; i < 3; i++ {
+				if feed.Items[i] == nil {
+					feed.Items[i].Link = ""
+					feed.Items[i].Title = "N/A"
+					feed.Items[i].Published = "N/A"
+				}
+				fmt.Fprintf(w, "\n")
+				fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[i].Link, feed.Items[i].Title, feed.Items[i].Published)
+			}
+			//fmt.Fprintf(w, "\n")
+			//fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[0].Link, feed.Items[0].Title, feed.Items[0].Published)
+			//fmt.Fprintf(w, "\n")
+			//fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[1].Link, feed.Items[1].Title, feed.Items[1].Published)
+			//fmt.Fprintf(w, "\n")
+			//fmt.Fprintf(w, " - <a href=\"%s\">%s</a> (%s)", feed.Items[2].Link, feed.Items[2].Title, feed.Items[2].Published)
 			fmt.Fprintf(w, "\n")
 			fmt.Fprintf(w, "\n")
 		}
