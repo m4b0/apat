@@ -1,6 +1,12 @@
+http://feeds.feedburner.com/isc2Blog?format=xml
+https://www.theregister.co.uk/headlines.atom
+https://hnrss.org/newest
+https://hnrss.org/frontpage
+https://www.darkreading.com/rss_simple.asp
 https://www.csoonline.com/index.rss
 https://threatpost.com/feed/
 https://krebsonsecurity.com/feed/
+http://feeds2.feedburner.com/security-awareness-tip-of-the-day
 https://www.schneier.com/blog/atom.xml
 https://www.wired.com/feed/category/security/latest/rss
 https://www.us-cert.gov/ncas/current-activity.xml
@@ -11,3 +17,5 @@ https://www.us-cert.gov/ncas/alerts.xml
 http://feeds.trendmicro.com/TrendMicroSimplySecurity
 https://www.cisecurity.org/feed/advisories
 https://www.cisecurity.org/feed/?post_type=blog
+http://feeds.feedburner.com/securityweekly/XBIC
+http://www.veracode.com/blog/feed
