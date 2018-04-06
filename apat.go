@@ -9,6 +9,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/mmcdole/gofeed"
 )
@@ -18,6 +19,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"+
 		"<title>apat %s</title></head><body>", r.URL.Path[1:])
 	fmt.Fprintf(w, "<pre>")
+
+	// Here's a basic example of formatting a time
+	t := time.Now()
+	fmt.Fprintf(w, t.Format("Mon Jan 2 15:04:05 MST 2006")+"\n")
+	fmt.Fprintf(w, "\n")
 
 	// Title
 	fmt.Fprintf(w, "<b><a href=\"https://github.com/m4b0/apat\">apat</a> (a path) - another personalized aggregator tool</b>\n")
