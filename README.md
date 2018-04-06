@@ -31,6 +31,13 @@ Typically an aggregator is a system of subprograms:
 * More useful
 * More… ツ 
 
+#### Configuration
+The basic configuration is to include topics names into topics folder and then add some links into files located into sources directory.
+
+You can personalize your content including links and regular expressions into the file hot-topics.src located in sources folder.
+
+I have provided some examples, so you can have an idea how to configure this.
+
 #### References
 
 http://michaelnielsen.org/blog/information-aggregators/
