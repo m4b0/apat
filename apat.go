@@ -34,14 +34,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "\n")
 
 	// CISecurity Cyber Threat Alert Level
-	url := "https://feeds.cisecurity.org/text?keys=description"
-	resp, err := http.Get(url)
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(bodyBytes)
-	defer resp.Body.Close() // close Body when the function returns
-	fmt.Fprintf(w, "<textarea rows=\"5\"cols=\"60\">")
-	fmt.Fprintf(w, bodyString)
-	fmt.Fprintf(w, "</textarea>\n\n")
+	// url := "https://feeds.cisecurity.org/text?keys=description"
+	// resp, err := http.Get(url)
+	// bodyBytes, err := ioutil.ReadAll(resp.Body)
+	// bodyString := string(bodyBytes)
+	// defer resp.Body.Close() // close Body when the function returns
+	// fmt.Fprintf(w, "<textarea rows=\"5\"cols=\"60\">")
+	// fmt.Fprintf(w, bodyString)
+	// fmt.Fprintf(w, "</textarea>\n\n")
 
 	path := "sources/hot-topics.src"
 	inFile, _ := os.Open(path)

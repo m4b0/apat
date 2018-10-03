@@ -1,3 +1,4 @@
+https://www.cisecurity.org/cybersecurity-threats/ - CIS-Cibersecurity-Threats - Alert Level - .*<span class="text-primary .+">(.+)</span>
 https://www.symantec.com/security_response/threatcon/ - Symantec-ThreatCon - Level - The.ThreatCon.is.(.+).<
 https://www.ovh.com/ca/en/news/ - OVH-News - Latest news - >Latest news.+\n.+<a .+>(.+)</a>
 https://www.timeanddate.com/weather/canada/montreal - Weather - Montreal - Now.+h2>(.+)<\/div><p>(.+)<\/p>.+<p>(.+)<br>(.+)<br>(.+)<span
