@@ -1,0 +1,6 @@
+https://www.symantec.com/security_response/threatcon/ - Symantec-ThreatCon - Level - The.ThreatCon.is.(.+).<
+https://www.ovh.com/ca/en/news/ - OVH-News - Latest news - >Latest news.+\n.+<a .+>(.+)</a>
+https://www.timeanddate.com/weather/canada/montreal - Weather - Montreal - Now.+h2>(.+)<\/div><p>(.+)<\/p>.+<p>(.+)<br>(.+)<br>(.+)<span
+http://www.espn.com/mlb/team/_/name/bos/boston-red-sox - Red Sox - PCT - >Boston<.+?right.+?right.+?right">(.+?)<
+http://www.espn.com/mlb/team/_/name/tor/toronto-blue-jays - Blue Jays - PCT - >Toronto<.+?right.+?right.+?right">(.+?)<
+http://www.espn.com/mlb/team/_/name/nyy/new-york-yankees - Yankees - PCT - >New York<.+?right.+?right.+?right">(.+?)<
