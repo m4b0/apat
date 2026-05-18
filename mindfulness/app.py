@@ -143,7 +143,7 @@ def healthz():
     return jsonify({"status": "ok"})
 
 
-@app.route("/")
+@app.route("/focus")
 def index():
     return render_template("index.html")
 
