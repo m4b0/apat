@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindfulness
+  labels:
+    app: mindfulness
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mindfulness
+  template:
+    metadata:
+      labels:
+        app: mindfulness
+    spec:
+      containers:
+        - name: mindfulness
+          image: mindfulness:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            failureThreshold: 2
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000

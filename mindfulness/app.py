@@ -138,6 +138,11 @@ def generate_memory():
 CHALLENGE_TYPES = ["math", "math", "word", "memory"]
 
 
+@app.route("/healthz")
+def healthz():
+    return jsonify({"status": "ok"})
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
