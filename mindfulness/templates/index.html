@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Present Moment</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #f4f1ec;
+    --card:    #ffffff;
+    --primary: #4a7fa5;
+    --green:   #5a9e6f;
+    --red:     #c0504d;
+    --text:    #2e2e2e;
+    --muted:   #7a7a7a;
+    --border:  #e0dbd3;
+    --breath:  #7ab8d4;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  /* ---------- Views ---------- */
+  .view { display: none; width: 100%; max-width: 520px; animation: fadeIn .35s ease; }
+  .view.active { display: flex; flex-direction: column; align-items: center; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---------- Card ---------- */
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 2.4rem 2rem;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(0,0,0,.07);
+    text-align: center;
+  }
+
+  /* ---------- Typography ---------- */
+  h1 { font-size: 2.4rem; font-weight: 300; letter-spacing: .04em; }
+  h2 { font-size: 1.5rem; font-weight: 500; margin-bottom: .5rem; }
+  .sub  { color: var(--muted); font-size: .95rem; margin-top: .4rem; line-height: 1.6; }
+  .hint { color: var(--muted); font-size: .82rem; margin-top: .3rem; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-block;
+    padding: .7rem 2rem;
+    border-radius: 50px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 3px 12px rgba(74,127,165,.3); }
+  .btn-primary:hover { box-shadow: 0 5px 18px rgba(74,127,165,.4); }
+  .btn-ghost  { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ---------- Progress bar ---------- */
+  .progress-wrap { width: 100%; margin-bottom: 1.4rem; }
+  .progress-track {
+    height: 5px; background: var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--primary); border-radius: 10px;
+    transition: width .5s ease;
+  }
+  .progress-label { font-size: .78rem; color: var(--muted); text-align: right; margin-top: .3rem; }
+
+  /* ---------- Breathing ---------- */
+  #breath-phase {
+    font-size: 1.1rem; font-weight: 500; color: var(--primary);
+    letter-spacing: .06em; text-transform: uppercase;
+    margin-bottom: 2rem; min-height: 1.5em;
+  }
+  .breath-stage {
+    position: relative;
+    width: 180px; height: 180px;
+    margin: 0 auto 2rem;
+  }
+  .breath-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #b8ddf0, var(--breath));
+    opacity: .7;
+    transform: scale(1);
+    transition: transform 4s cubic-bezier(.4,0,.2,1), opacity 4s ease;
+  }
+  .breath-ring.glow {
+    box-shadow: 0 0 40px 12px rgba(122,184,212,.45);
+  }
+  .breath-count {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 300; color: #3a6070;
+  }
+  #breath-timer { font-variant-numeric: tabular-nums; }
+  #breath-cycles { color: var(--muted); font-size: .85rem; margin-top: -.5rem; margin-bottom: 1.5rem; }
+
+  /* ---------- Math ---------- */
+  .equation {
+    font-size: 3rem; font-weight: 300; letter-spacing: .05em;
+    margin: 1.2rem 0;
+    color: var(--text);
+  }
+  .answer-input {
+    width: 100%; max-width: 200px;
+    font-size: 1.6rem; text-align: center;
+    padding: .5rem .8rem;
+    border: 2px solid var(--border); border-radius: 12px;
+    outline: none; background: var(--bg);
+    transition: border-color .2s;
+    color: var(--text);
+  }
+  .answer-input:focus { border-color: var(--primary); }
+  .answer-input.correct { border-color: var(--green); background: #f0faf3; }
+  .answer-input.wrong   { border-color: var(--red);   background: #fdf2f2; }
+  .level-badge {
+    display: inline-block; padding: .2rem .7rem;
+    border-radius: 20px; font-size: .72rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em;
+    background: var(--bg); color: var(--muted); border: 1px solid var(--border);
+    margin-bottom: .5rem;
+  }
+
+  /* ---------- Word ---------- */
+  .word-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .75rem; margin: 1.4rem 0;
+  }
+  .word-btn {
+    padding: .9rem .6rem;
+    border: 2px solid var(--border); border-radius: 14px;
+    background: var(--bg); font-size: 1.05rem; cursor: pointer;
+    transition: border-color .2s, background .2s, transform .15s;
+    color: var(--text);
+  }
+  .word-btn:hover { border-color: var(--primary); background: #edf4fa; }
+  .word-btn.selected { border-color: var(--primary); background: #dbedf8; font-weight: 600; }
+  .word-btn.correct  { border-color: var(--green);   background: #e8f7ed; pointer-events: none; }
+  .word-btn.wrong    { border-color: var(--red);     background: #fdecea; pointer-events: none; }
+  .word-btn.reveal   { border-color: var(--green);   background: #e8f7ed; pointer-events: none; }
+
+  /* ---------- Memory ---------- */
+  .sequence-display {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem;
+    margin: 1.4rem 0;
+    min-height: 60px;
+  }
+  .seq-item {
+    padding: .5rem 1rem; border-radius: 10px;
+    background: var(--primary); color: #fff;
+    font-size: 1.4rem; font-weight: 500;
+    letter-spacing: .04em;
+    animation: popIn .25s ease backwards;
+  }
+  .seq-item.word-item { font-size: 1rem; padding: .55rem 1rem; }
+  @keyframes popIn { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
+
+  .memory-countdown {
+    font-size: 2rem; font-weight: 300; color: var(--primary);
+    min-height: 2.5rem;
+  }
+  .memory-input {
+    width: 100%; font-size: 1.2rem; text-align: center;
+    padding: .6rem 1rem;
+    border: 2px solid var(--border); border-radius: 12px;
+    outline: none; background: var(--bg);
+    transition: border-color .2s;
+    color: var(--text);
+  }
+  .memory-input:focus { border-color: var(--primary); }
+
+  /* ---------- Feedback ---------- */
+  .feedback-icon { font-size: 3.5rem; margin-bottom: .5rem; }
+  .feedback-result { font-size: 1.5rem; font-weight: 600; margin-bottom: .4rem; }
+  .feedback-result.ok  { color: var(--green); }
+  .feedback-result.err { color: var(--red);   }
+  .feedback-detail { color: var(--muted); font-size: .9rem; margin-bottom: 1rem; }
+  .mindful-note {
+    font-size: .9rem; color: var(--muted); font-style: italic;
+    border-top: 1px solid var(--border); padding-top: .9rem; margin-top: .5rem;
+  }
+
+  /* ---------- Summary ---------- */
+  .score-ring {
+    width: 110px; height: 110px; border-radius: 50%;
+    background: conic-gradient(var(--primary) 0%, var(--border) 0%);
+    display: flex; align-items: center; justify-content: center;
+    margin: 1.2rem auto;
+    position: relative;
+  }
+  .score-ring::before {
+    content: '';
+    position: absolute; inset: 12px; border-radius: 50%;
+    background: var(--card);
+  }
+  .score-number {
+    position: relative; z-index: 1;
+    font-size: 1.7rem; font-weight: 600; color: var(--primary);
+  }
+  .summary-msg { font-size: 1rem; color: var(--muted); margin: .5rem 0 1.5rem; }
+
+  /* ---------- Spacing helpers ---------- */
+  .mt1 { margin-top: .5rem; }
+  .mt2 { margin-top: 1rem; }
+  .mt3 { margin-top: 1.5rem; }
+  .row { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<!-- ======================================================= LANDING -->
+<div id="view-landing" class="view active">
+  <div style="text-align:center; margin-bottom:2rem;">
+    <h1>Present Moment</h1>
+    <p class="sub">Breathe in. Focus. Be here now.</p>
+  </div>
+  <div class="card">
+    <p style="color:var(--muted); font-size:.93rem; line-height:1.7; margin-bottom:1.5rem;">
+      Each session starts with a short breathing exercise,<br>
+      then challenges your mind with maths, words, and memory —<br>
+      all designed to anchor your attention to <em>right now</em>.
+    </p>
+    <div style="display:flex;gap:.6rem;justify-content:center;font-size:.82rem;color:var(--muted);margin-bottom:1.6rem;">
+      <span>🫁 Breathing</span>
+      <span>·</span>
+      <span>➕ Maths</span>
+      <span>·</span>
+      <span>🔤 Words</span>
+      <span>·</span>
+      <span>🧠 Memory</span>
+    </div>
+    <button class="btn btn-primary" onclick="app.startSession()">Begin Session</button>
+  </div>
+</div>
+
+<!-- ======================================================= BREATHING -->
+<div id="view-breathing" class="view">
+  <div class="card">
+    <h2>Breathing Exercise</h2>
+    <p class="sub" style="margin-bottom:1.8rem;">Follow the circle. Let thoughts pass.</p>
+
+    <div id="breath-phase">Prepare…</div>
+
+    <div class="breath-stage">
+      <div class="breath-ring" id="breath-circle"></div>
+      <div class="breath-count"><span id="breath-timer">—</span></div>
+    </div>
+
+    <p id="breath-cycles">Cycle 1 of 2</p>
+
+    <div class="row">
+      <button class="btn btn-ghost" onclick="app.skipBreathing()">Skip</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= CHALLENGE -->
+<div id="view-challenge" class="view">
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">Challenge 1 of 5</div>
+  </div>
+
+  <div class="card" id="challenge-card">
+    <!-- filled dynamically -->
+  </div>
+</div>
+
+<!-- ======================================================= FEEDBACK -->
+<div id="view-feedback" class="view">
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="feedback-fill"></div></div>
+    <div class="progress-label" id="feedback-label"></div>
+  </div>
+
+  <div class="card">
+    <div class="feedback-icon" id="fb-icon"></div>
+    <div class="feedback-result" id="fb-result"></div>
+    <div class="feedback-detail" id="fb-detail"></div>
+    <button class="btn btn-primary mt2" onclick="app.nextChallenge()">Continue →</button>
+    <p class="mindful-note" id="fb-note"></p>
+  </div>
+</div>
+
+<!-- ======================================================= SUMMARY -->
+<div id="view-summary" class="view">
+  <div class="card">
+    <h2>Session Complete</h2>
+    <div class="score-ring" id="score-ring">
+      <span class="score-number" id="score-number">—</span>
+    </div>
+    <p class="summary-msg" id="summary-msg"></p>
+    <div class="row">
+      <button class="btn btn-primary" onclick="app.startSession()">New Session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────────────────────
+// Mindfulness tips shown in feedback
+// ──────────────────────────────────────────────────────────────
+const MINDFUL_NOTES = [
+  "Your attention is your most valuable resource — spend it wisely.",
+  "Notice how your mind locked in just now. That's focus.",
+  "Breathe. The present moment is the only place anything happens.",
+  "Each correct answer is a small proof you're fully here.",
+  "A distracted mind wanders 47% of the time. Yours didn't, just now.",
+  "Focus is a muscle. You just used it.",
+  "Wherever you go, there you are.",
+  "The quality of your attention determines the quality of your experience.",
+  "Rest in the space between thoughts.",
+  "You just solved something. Completely. That's mindfulness in action.",
+];
+
+function randomNote() {
+  return MINDFUL_NOTES[Math.floor(Math.random() * MINDFUL_NOTES.length)];
+}
+
+// ──────────────────────────────────────────────────────────────
+// App state
+// ──────────────────────────────────────────────────────────────
+const app = {
+  score: 0,
+  challenged: 0,
+  maxChallenges: 5,
+  current: null,
+  breathTimer: null,
+
+  // ── Navigation ───────────────────────────────────────────────
+  show(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const el = document.getElementById('view-' + viewId);
+    el.classList.add('active');
+    // force re-trigger CSS animation
+    void el.offsetWidth;
+  },
+
+  // ── Session ──────────────────────────────────────────────────
+  startSession() {
+    this.score = 0;
+    this.challenged = 0;
+    this.current = null;
+    this.startBreathing();
+  },
+
+  // ── Breathing ────────────────────────────────────────────────
+  startBreathing() {
+    this.show('breathing');
+    const circle   = document.getElementById('breath-circle');
+    const phaseEl  = document.getElementById('breath-phase');
+    const timerEl  = document.getElementById('breath-timer');
+    const cyclesEl = document.getElementById('breath-cycles');
+
+    const phases = [
+      { name: 'Inhale',  duration: 4, scale: 1.65 },
+      { name: 'Hold',    duration: 4, scale: 1.65 },
+      { name: 'Exhale',  duration: 4, scale: 1.0  },
+      { name: 'Rest',    duration: 4, scale: 1.0  },
+    ];
+
+    const totalCycles = 2;
+    let cycle = 0, phaseIdx = 0, tick = 0;
+    let finished = false;
+
+    const applyPhase = () => {
+      const p = phases[phaseIdx];
+      circle.style.transform = `scale(${p.scale})`;
+      circle.style.opacity   = p.scale > 1 ? '0.9' : '0.6';
+      circle.classList.toggle('glow', p.scale > 1);
+      phaseEl.textContent = p.name;
+      timerEl.textContent = p.duration;
+      cyclesEl.textContent = `Cycle ${cycle + 1} of ${totalCycles}`;
+    };
+
+    clearInterval(this.breathTimer);
+    applyPhase();
+
+    this.breathTimer = setInterval(() => {
+      if (finished) return;
+      tick++;
+      const p = phases[phaseIdx];
+      const remaining = p.duration - tick;
+      timerEl.textContent = remaining > 0 ? remaining : '';
+
+      if (tick >= p.duration) {
+        tick = 0;
+        phaseIdx++;
+        if (phaseIdx >= phases.length) {
+          phaseIdx = 0;
+          cycle++;
+          if (cycle >= totalCycles) {
+            finished = true;
+            clearInterval(this.breathTimer);
+            phaseEl.textContent = 'Well done ✓';
+            timerEl.textContent = '';
+            setTimeout(() => this.nextChallenge(), 1200);
+            return;
+          }
+        }
+        applyPhase();
+      } else {
+        timerEl.textContent = remaining;
+      }
+    }, 1000);
+  },
+
+  skipBreathing() {
+    clearInterval(this.breathTimer);
+    this.nextChallenge();
+  },
+
+  // ── Challenge flow ───────────────────────────────────────────
+  async nextChallenge() {
+    if (this.challenged >= this.maxChallenges) {
+      this.showSummary();
+      return;
+    }
+    try {
+      const res = await fetch('/api/challenge?type=random');
+      this.current = await res.json();
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+    this.challenged++;
+    this.updateProgress();
+    this.renderChallenge(this.current);
+    this.show('challenge');
+  },
+
+  updateProgress(onFeedback = false) {
+    const pct = ((this.challenged - 1) / this.maxChallenges) * 100;
+    const fullPct = (this.challenged / this.maxChallenges) * 100;
+    const label = `Challenge ${this.challenged} of ${this.maxChallenges}`;
+
+    if (!onFeedback) {
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = label;
+    }
+    document.getElementById('feedback-fill').style.width = fullPct + '%';
+    document.getElementById('feedback-label').textContent = label;
+  },
+
+  // ── Render ───────────────────────────────────────────────────
+  renderChallenge(ch) {
+    const card = document.getElementById('challenge-card');
+    if      (ch.type === 'math')   this.renderMath(ch, card);
+    else if (ch.type === 'word')   this.renderWord(ch, card);
+    else if (ch.type === 'memory') this.renderMemory(ch, card);
+  },
+
+  // ── Math ─────────────────────────────────────────────────────
+  renderMath(ch, card) {
+    card.innerHTML = `
+      <span class="level-badge">${ch.level}</span>
+      <p class="sub" style="margin-bottom:.5rem;">What is the result?</p>
+      <div class="equation">${ch.question} = ?</div>
+      <input id="math-input" class="answer-input" type="number" inputmode="numeric"
+             autocomplete="off" placeholder="?" autofocus>
+      <p class="hint mt1">Press Enter or click Submit</p>
+      <div class="mt3">
+        <button class="btn btn-primary" onclick="app.submitMath()">Submit</button>
+      </div>
+    `;
+    const inp = document.getElementById('math-input');
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') app.submitMath(); });
+    setTimeout(() => inp.focus(), 80);
+  },
+
+  submitMath() {
+    const inp = document.getElementById('math-input');
+    const val = inp.value.trim();
+    if (!val) return;
+    const correct = val === this.current.answer;
+    this.showFeedback(correct, correct ? null : `Answer: ${this.current.answer}`);
+  },
+
+  // ── Word ─────────────────────────────────────────────────────
+  renderWord(ch, card) {
+    const btns = ch.words.map(w => `
+      <button class="word-btn" onclick="app.selectWord('${w}')" id="wb-${w.replace(/\s/g,'_')}">${w}</button>
+    `).join('');
+    card.innerHTML = `
+      <h2>${ch.question}</h2>
+      <p class="sub">Tap the word that doesn't fit with the others.</p>
+      <div class="word-grid">${btns}</div>
+      <button class="btn btn-primary" id="word-submit" onclick="app.submitWord()" disabled>Submit</button>
+    `;
+    this._wordSelected = null;
+  },
+
+  selectWord(word) {
+    // deselect previous
+    document.querySelectorAll('.word-btn').forEach(b => b.classList.remove('selected'));
+    const id = 'wb-' + word.replace(/\s/g, '_');
+    document.getElementById(id).classList.add('selected');
+    this._wordSelected = word;
+    document.getElementById('word-submit').disabled = false;
+  },
+
+  submitWord() {
+    if (!this._wordSelected) return;
+    const correct = this._wordSelected === this.current.answer;
+
+    // colour the buttons
+    document.querySelectorAll('.word-btn').forEach(btn => {
+      const w = btn.textContent.trim();
+      btn.classList.remove('selected');
+      if (w === this.current.answer) {
+        btn.classList.add(correct ? 'correct' : 'reveal');
+      } else if (w === this._wordSelected && !correct) {
+        btn.classList.add('wrong');
+      }
+      btn.disabled = true;
+    });
+    document.getElementById('word-submit').disabled = true;
+
+    const detail = correct
+      ? null
+      : `"${this.current.answer}" is the odd one out (${this.current.reason}).`;
+    setTimeout(() => this.showFeedback(correct, detail), 600);
+  },
+
+  // ── Memory ───────────────────────────────────────────────────
+  renderMemory(ch, card) {
+    const isWords = ch.mode === 'words';
+    const items = ch.sequence.map((s, i) =>
+      `<span class="seq-item ${isWords ? 'word-item' : ''}"
+             style="animation-delay:${i * 0.12}s">${s}</span>`
+    ).join('');
+
+    card.innerHTML = `
+      <h2>Memory</h2>
+      <p class="sub">Memorise the sequence, then recall it.</p>
+      <div class="sequence-display" id="seq-display">${items}</div>
+      <div class="memory-countdown" id="mem-cd">Memorise: <span id="mem-tick">4</span>s</div>
+      <div id="mem-input-wrap" style="display:none; margin-top:1rem;">
+        <p class="hint" style="margin-bottom:.6rem;">${ch.hint}</p>
+        <input id="mem-input" class="memory-input" type="text" autocomplete="off"
+               placeholder="${isWords ? 'word1 word2 ...' : '123...'}">
+        <div class="mt3">
+          <button class="btn btn-primary" onclick="app.submitMemory()">Submit</button>
+        </div>
+      </div>
+    `;
+
+    let t = 4;
+    const ticker = setInterval(() => {
+      t--;
+      const el = document.getElementById('mem-tick');
+      if (el) el.textContent = t;
+      if (t <= 0) {
+        clearInterval(ticker);
+        const disp = document.getElementById('seq-display');
+        const wrap = document.getElementById('mem-input-wrap');
+        const cd   = document.getElementById('mem-cd');
+        if (disp) disp.style.visibility = 'hidden';
+        if (cd)   cd.style.display = 'none';
+        if (wrap) wrap.style.display = 'block';
+        setTimeout(() => {
+          const inp = document.getElementById('mem-input');
+          if (inp) inp.focus();
+        }, 50);
+      }
+    }, 1000);
+    // store so we can clear on navigation
+    this._memTicker = ticker;
+  },
+
+  submitMemory() {
+    const inp = document.getElementById('mem-input');
+    if (!inp) return;
+    const raw = inp.value.trim();
+    const ch  = this.current;
+
+    // normalise: collapse spaces, lowercase
+    const normalise = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
+    let correct;
+
+    if (ch.mode === 'numbers') {
+      // allow "3 7 2" or "372"
+      correct = normalise(raw.replace(/\s/g, '')) === ch.answer.replace(/\s/g, '');
+    } else {
+      correct = normalise(raw) === normalise(ch.answer);
+    }
+
+    const detail = correct ? null : `Sequence was: ${ch.sequence.join(ch.mode === 'numbers' ? '' : ' · ')}`;
+    this.showFeedback(correct, detail);
+  },
+
+  // ── Feedback ─────────────────────────────────────────────────
+  showFeedback(correct, detail) {
+    if (correct) this.score++;
+    clearInterval(this._memTicker);
+
+    document.getElementById('fb-icon').textContent   = correct ? '✓' : '✗';
+    document.getElementById('fb-result').textContent = correct ? 'Correct!' : 'Not quite';
+    document.getElementById('fb-result').className   = 'feedback-result ' + (correct ? 'ok' : 'err');
+    document.getElementById('fb-detail').textContent = detail || '';
+    document.getElementById('fb-note').textContent   = randomNote();
+
+    this.show('feedback');
+  },
+
+  // ── Summary ──────────────────────────────────────────────────
+  showSummary() {
+    const pct = Math.round((this.score / this.maxChallenges) * 100);
+    const ring = document.getElementById('score-ring');
+    ring.style.background =
+      `conic-gradient(var(--primary) ${pct}%, var(--border) ${pct}%)`;
+
+    document.getElementById('score-number').textContent =
+      `${this.score}/${this.maxChallenges}`;
+
+    const msgs = [
+      [5, "Perfect! Your mind is sharp and fully here. 🌟"],
+      [4, "Excellent focus. One small slip — you've got this."],
+      [3, "Solid session. A few distractions crept in; that's normal."],
+      [2, "Good start. Your attention is building. Keep coming back."],
+      [0, "Every session is practice. Breathe, return, try again."],
+    ];
+    const msg = msgs.find(([threshold]) => this.score >= threshold);
+    document.getElementById('summary-msg').textContent = msg ? msg[1] : '';
+
+    this.show('summary');
+  },
+};
+</script>
+</body>
+</html>
